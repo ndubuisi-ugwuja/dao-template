@@ -1,239 +1,296 @@
 # DAO Template
 
-- [DAO Template](#dao-template)
-    - [About](#about)
-        - [How to DAO](#how-to-dao)
-        - [No Code Tools](#no-code-tools)
+A comprehensive smart contract template for building decentralized autonomous organizations (DAOs) with on-chain governance capabilities.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Governance Models](#governance-models)
 - [Getting Started](#getting-started)
-    - [Requirements](#requirements)
-        - [Installation](#installation)
-    - [Usage](#usage)
-        - [On-Chain Governance Example](#on-chain-governance-example)
-        - [Off-Chain governance Example](#off-chain-governance-example)
-    - [Roadmap](#roadmap)
-    - [Contributing](#contributing)
-    - [License](#license)
-    - [Contact](#contact)
-    - [Acknowledgments](#acknowledgments)
+- [Usage](#usage)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Tools & Resources](#tools--resources)
+- [Contributing](#contributing)
+- [License](#license)
+- [Author](#author)
 
-<!-- ABOUT THE PROJECT -->
+## Overview
 
-## About
+This repository provides a production-ready foundation for creating DAOs with governance mechanisms. It includes smart contracts, deployment scripts, and examples demonstrating both on-chain and hybrid governance patterns.
 
-### How to DAO
+### Key Components
 
-This repo is meant to give you all the knowledge you need to start a DAO and do governance. Since what's the point of a DAO if you can't make any decisions! There are 2 main kinds of doing governance.
+- **Governance Token (ERC20)**: Token-based voting rights for DAO members
+- **Governor Contract**: Handles proposal creation, voting, and execution
+- **Timelock Controller**: Enforces a delay between proposal approval and execution
+- **Example Contracts**: Sample contracts (Box) to demonstrate governance in action
 
-| Feature    | On-Chain Governance | Hybrid Governance             |
-| ---------- | ------------------- | ----------------------------- |
-| Gas Costs  | More Expensive      | Cheaper                       |
-| Components | Just the blockchain | An oracle or trusted multisig |
+## Features
 
-A typical on-chain governance structure might look like:
+- ✅ OpenZeppelin-based governance contracts
+- ✅ Timelock mechanism for proposal execution
+- ✅ Comprehensive test suite
+- ✅ Ready-to-use deployment scripts
+- ✅ Examples of proposal lifecycle (propose, vote, queue, execute)
+- ✅ Support for both on-chain and hybrid governance models
 
-- ERC20 based voting happens on a project like [Tally](https://www.withtally.com/), but could hypothetically be done by users manually calling the vote functions.
-- Anyone can execute a proposal once it has passed
-  _Examples [Compound](https://compound.finance/governance)_
+## Governance Models
 
-On-chain governance can be much more expensive, but involves fewer parts, and the tooling is still being developed.
+### On-Chain Governance
 
-A typical hybrid governance with an oracle might look like:
+Fully decentralized governance where all voting and execution happens on the blockchain.
 
-- ERC20 based voting happens on a project like [Snapshot](https://snapshot.org/#/)
-- An oracle like [Chainlink](https://chain.link/) is used to retreive and execute the answers in a decentralized manner. (hint hint, someone should build this. )
+**Advantages:**
 
-A typical hybrid governance with a trusted multisig might look like:
+- Trustless execution
+- Complete transparency
+- No intermediaries required
 
-- ERC20 based voting happens on a project like [Snapshot](https://snapshot.org/#/)
-- A trusted [gnosis multisig](https://gnosis-safe.io/) is used to exectue the results of snapshot.
-  _Examples: [Snapsafe](https://blog.gnosis.pm/introducing-safesnap-the-first-in-a-decentralized-governance-tool-suite-for-the-gnosis-safe-ea67eb95c34f)_
+**Tradeoffs:**
 
-Hybrid governance is much cheaper, just as secure, but the tooling is still being developed.
+- Higher gas costs
+- Slower execution due to on-chain processing
 
-Tools:
+**Example Flow:**
 
-- [Snapshot](https://snapshot.org/#/)
-    - UI for off-chain voting / sentiment analysis
-- [Tally](https://www.withtally.com/)
-    - UI for on-chain voting
-- [Gnosis Safe](https://gnosis-safe.io/)
-    - Multi-sig
-- [Openzeppelin](https://docs.openzeppelin.com/contracts/4.x/api/governance)
-    - DAO code tools
-- [Zodiac](https://github.com/gnosis/zodiac)
-    - More DAO code tools
-- [Openzeppelin Defender](https://openzeppelin.com/defender/)
-    - A tool to propose governance and other contract functions.
+1. Proposal created on-chain
+2. Token holders vote directly on the blockchain
+3. Approved proposals execute automatically via Timelock
+4. Used by projects like Compound and Uniswap
 
-### No Code Tools
+### Hybrid Governance
 
-The following have tools to help you start a DAO without having to deploy contracts yourself.
+Combines off-chain voting with on-chain execution for cost efficiency.
 
-- [DAO Stack](https://alchemy.daostack.io/daos/create)
-- [Aragon](https://aragon.org/)
-- [Colony](https://colony.io/)
-- [DAOHaus](https://app.daohaus.club/summon)
-- [DAO Leaderboard](https://deepdao.io/#/deepdao/dashboard)
+**Advantages:**
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+- Significantly lower gas costs
+- Faster voting process
+- Scalable for larger communities
 
-<!-- GETTING STARTED -->
+**Tradeoffs:**
 
-# Getting Started
+- Requires oracle or trusted multisig for execution
+- Additional infrastructure needed
 
-Work with this repo in the browser (optional)<br/>
+**Implementation Options:**
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/PatrickAlphaC/dao-template)
+| Method         | Tool                   | Security Model                  |
+| -------------- | ---------------------- | ------------------------------- |
+| Oracle-based   | Chainlink              | Decentralized oracle network    |
+| Multisig-based | Gnosis Safe + Snapshot | Trusted signers execute results |
 
-It's recommended that you've gone through the [hardhat getting started documentation](https://hardhat.org/getting-started/) before proceeding here.
+## Getting Started
 
-## Requirements
+### Prerequisites
 
-- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-    - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
-- [Nodejs](https://nodejs.org/en/)
-    - You'll know you've installed nodejs right if you can run:
-        - `node --version`and get an ouput like: `vx.x.x`
-- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/) instead of `npm`
-    - You'll know you've installed yarn right if you can run:
-        - `yarn --version` And get an output like: `x.x.x`
-        - You might need to install it with npm
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Node.js](https://nodejs.org/) (v14+ recommended)
+- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/)
+
+Verify installations:
+
+```bash
+git --version
+node --version
+yarn --version
+```
 
 ### Installation
 
-1. Clone this repo:
+**Clone the repository:**
 
-```
+```bash
 git clone https://github.com/ndubuisi-ugwuja/dao-template.git
 cd dao-template
 ```
 
-2. Install dependencies
+**Install dependencies:**
 
-```sh
+```bash
 yarn install
 ```
 
-3. Run the test suite (which also has all the functionality)
+**Create environment file:**
 
+```bash
+cp .env.example .env
 ```
+
+**Configure your `.env` file with required variables:**
+
+```env
+PRIVATE_KEY=your_private_key_here
+SEPOLIA_RPC_URL=your_rpc_url_here
+ETHERSCAN_API_KEY=your_etherscan_api_key_here
+```
+
+> ⚠️ **Security Warning**: Never commit your `.env` file or expose your private keys publicly.
+
+## Testing
+
+Run the complete test suite:
+
+```bash
 yarn hardhat test
 ```
 
-If you want to deploy to a testnet: 4. Add a `.env` file with the same contents of `.env.example`, but replaced with your variables.
-![WARNING](https://via.placeholder.com/15/f03c15/000000?text=+) **WARNING** ![WARNING](https://via.placeholder.com/15/f03c15/000000?text=+)
+For detailed gas reporting:
 
-> DO NOT PUSH YOUR PRIVATE_KEY TO GITHUB
-
-<!-- USAGE EXAMPLES -->
+```bash
+REPORT_GAS=true yarn hardhat test
+```
 
 ## Usage
 
-### On-Chain Governance Example
+### Local Development Workflow
 
-Here is the rundown of what the test suite does.
+#### Step 1: Start Local Blockchain
 
-1. We will deploy an ERC20 token that we will use to govern our DAO.
-2. We will deploy a Timelock contract that we will use to give a buffer between executing proposals.
-    1. Note: **The timelock is the contract that will handle all the money, ownerships, etc**
-3. We will deploy our Governence contract
-    1. Note: **The Governance contract is in charge of proposals and such, but the Timelock executes!**
-4. We will deploy a simple Box contract, which will be owned by our governance process! (aka, our timelock contract).
-5. We will propose a new value to be added to our Box contract.
-6. We will then vote on that proposal.
-7. We will then queue the proposal to be executed.
-8. Then, we will execute it!
-
-Additionally, you can do it all manually on your own local network like so:
-
-1. Setup local blockchain
-
-```
+```bash
 yarn hardhat node
 ```
 
-2. Propose a new value to be added to our Box contract
+#### Step 2: Deploy Contracts
 
-In a second terminal (leave your blockchain running)
+In a new terminal:
 
+```bash
+yarn hardhat run scripts/deploy.ts --network localhost
 ```
+
+#### Step 3: Create a Proposal
+
+```bash
 yarn hardhat run scripts/propose.ts --network localhost
 ```
 
-3. Vote on that proposal
+This script proposes a new value for the Box contract.
 
-```
+#### Step 4: Vote on Proposal
+
+```bash
 yarn hardhat run scripts/vote.ts --network localhost
 ```
 
-4. Queue & Execute proposal!
+#### Step 5: Queue and Execute
 
-```
+After the voting period ends and the proposal passes:
+
+```bash
 yarn hardhat run scripts/queue-and-execute.ts --network localhost
 ```
 
-You can also use the [Openzeppelin contract wizard](https://wizard.openzeppelin.com/#governor) to get other contracts to work with variations of this governance contract.
+### Understanding the Process
 
-### Off-Chain governance Example
+1. **Deploy Phase**:
+    - ERC20 governance token is deployed
+    - Timelock contract is deployed (holds all permissions)
+    - Governor contract is deployed (manages proposals)
+    - Box contract is deployed (owned by Timelock)
 
-> This sectoin is still being developed.
+2. **Propose Phase**:
+    - Create a proposal to change Box value
+    - Proposal enters pending state
 
-Deploy your ERC20 and [make proposals in snapshot](https://docs.snapshot.org/proposals/create).
+3. **Vote Phase**:
+    - Token holders vote (for, against, abstain)
+    - Voting period is defined in Governor contract
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+4. **Queue Phase**:
+    - Successful proposals are queued in Timelock
+    - Delay period begins
 
-<!-- ROADMAP -->
+5. **Execute Phase**:
+    - After delay, anyone can execute the proposal
+    - Changes take effect on-chain
 
-## Roadmap
+## Deployment
 
-- [] Add Upgradeability examples with the UUPS proxy pattern
-- [] Add Chainlink Oracle Integration with Snapsafe example
+### Testnet Deployment
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Deploy to Sepolia testnet:
 
-<!-- CONTRIBUTING -->
+```bash
+yarn hardhat run scripts/deploy.ts --network sepolia
+```
+
+### Mainnet Deployment
+
+1. Ensure sufficient ETH for gas fees
+2. Verify all contract parameters
+3. Deploy:
+
+    ```bash
+    yarn hardhat run scripts/deploy.ts --network mainnet
+    ```
+
+4. Verify contracts on Etherscan:
+
+```bash
+yarn hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS
+```
+
+## Tools & Resources
+
+### Development Tools
+
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/4.x/api/governance) - Secure governance primitives
+- [OpenZeppelin Wizard](https://wizard.openzeppelin.com/#governor) - Contract generation tool
+- [Hardhat](https://hardhat.org/) - Development environment
+
+### Governance Platforms
+
+- [Tally](https://www.withtally.com/) - On-chain governance interface
+- [Snapshot](https://snapshot.org/) - Off-chain voting platform
+- [Gnosis Safe](https://safe.global/) - Multisig wallet for hybrid governance
+
+### No-Code DAO Solutions
+
+- [Aragon](https://aragon.org/)
+- [DAOhaus](https://daohaus.club/)
+- [Colony](https://colony.io/)
+- [Syndicate](https://syndicate.io/)
+
+### Learning Resources
+
+- [OpenZeppelin Governance Guide](https://docs.openzeppelin.com/contracts/4.x/governance)
+- [Vitalik on DAOs](https://blog.ethereum.org/2014/05/06/daos-dacs-das-and-more-an-incomplete-terminology-guide/)
+- [On-Chain Governance Analysis](https://vitalik.ca/general/2021/08/16/voting3.html)
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are welcome! Please follow these steps:
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Please ensure your code:
 
-<!-- LICENSE -->
+- Passes all tests
+- Follows the existing code style
+- Includes appropriate documentation
 
 ## License
 
-This project is unlicensed. Free to use and redistribute.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- AUTHOR -->
+This project is unlicensed and free to use.
 
 ## Author
 
-Ndubuisi Ugwuja - [@joovhie\_](https://x.com/joovhie_)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- ACKNOWLEDGMENTS -->
+**Ndubuisi Ugwuja**  
+X: [@joovhie\_](https://x.com/joovhie_)
 
 ## Acknowledgments
 
-- [Openzeppelin Governance Walkthrough](https://docs.openzeppelin.com/contracts/4.x/governance)
-- [Openzeppelin Governance Github](https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master/contracts/governance)
-- [Vitalik on DAOs](https://blog.ethereum.org/2014/05/06/daos-dacs-das-and-more-an-incomplete-terminology-guide/)
-- [Vitalik on On-Chain Governance](https://vitalik.ca/general/2021/08/16/voting3.html)
-- [Vitalik on Governance in General](https://vitalik.ca/general/2017/12/17/voting.html)
+- OpenZeppelin team for governance contracts and documentation
+- Compound Finance for pioneering on-chain governance
+- Patrick Collins for the original DAO template inspiration
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+---
 
-You can check out the [openzeppelin javascript tests](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/e6f26b46fc8015f1b9b09bb85297464069302125/test/governance/extensions/GovernorTimelockControl.test.js) for a full suite of an example of what is possible.
+**Need Help?** Open an issue or reach out on X.
