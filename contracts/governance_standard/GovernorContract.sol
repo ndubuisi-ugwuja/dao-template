@@ -23,12 +23,13 @@ contract GovernorContract is
         IVotes _token,
         TimelockController _timelock,
         uint48 _votingDelay,
-        uint32 _votingPeriod
+        uint32 _votingPeriod,
+        uint256 _quorumPercentage
     )
         Governor("GovernorContract")
         GovernorSettings(_votingDelay, /* 1 block */ _votingPeriod, /* 1 week */ 0)
         GovernorVotes(_token)
-        GovernorVotesQuorumFraction(4)
+        GovernorVotesQuorumFraction(_quorumPercentage)
         GovernorTimelockControl(_timelock)
     {}
 
