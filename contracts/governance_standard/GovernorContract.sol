@@ -21,10 +21,12 @@ contract GovernorContract is
 {
     constructor(
         IVotes _token,
-        TimelockController _timelock
+        TimelockController _timelock,
+        uint48 _votingDelay,
+        uint32 _votingPeriod
     )
         Governor("GovernorContract")
-        GovernorSettings(1 /* 1 block */, 50400 /* 1 week */, 0)
+        GovernorSettings(_votingDelay, /* 1 block */ _votingPeriod, /* 1 week */ 0)
         GovernorVotes(_token)
         GovernorVotesQuorumFraction(4)
         GovernorTimelockControl(_timelock)
