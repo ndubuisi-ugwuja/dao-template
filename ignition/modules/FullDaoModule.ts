@@ -7,6 +7,9 @@ import BoxModule from "./BoxModule";
  * This deploys all contracts and sets up roles properly
  */
 const FullDaoModule = buildModule("FullDaoModule", (m) => {
+    // Get deployer account
+    const deployer = m.getAccount(0);
+
     // Deploy Governor (which also deploys Token and TimeLock)
     const { governor, governanceToken, timeLock } = m.useModule(GovernorModule);
 
@@ -28,11 +31,11 @@ const FullDaoModule = buildModule("FullDaoModule", (m) => {
         id: "GrantExecutorRole",
     });
 
-    // Revoke ADMIN_ROLE from deployer (optional but recommended for full decentralization)
-    // Uncomment the lines below if you want to fully renounce admin control
-    // m.call(timeLock, "revokeRole", [ADMIN_ROLE, m.getAccount(0)], {
-    //   id: "RevokeAdminRole"
-    // });
+    // Revoke ADMIN_ROLE from deployer for full decentralization
+    m.call(timeLock, "revokeRole", [ADMIN_ROLE, deployer], {
+        id: "RevokeAdminRole",
+        after: [m.call(timeLock, "grantRole", [PROPOSER_ROLE, governor], { id: "GrantProposerRole" })],
+    });
 
     return {
         governanceToken,
