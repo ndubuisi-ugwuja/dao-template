@@ -1,0 +1,6 @@
+{
+  "GovernanceTokenModule#GovernanceToken": "0xA080cc576baADB3836AF15C208e6Eb923AC03Fb2",
+  "TimeLockModule#TimeLock": "0x7341Af5bE714a4056AD6447a40F2146575345f1E",
+  "BoxModule#Box": "0x9F5676b4D7Cd828d1134C1cd2AE4a4c436B544e6",
+  "GovernorModule#GovernorContract": "0xcc75Bc28906735d349e0b62EA9f99aA9d6a07b5a"
+}
