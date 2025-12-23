@@ -19,14 +19,20 @@ const FullDaoModule = buildModule("FullDaoModule", (m) => {
     const ADMIN_ROLE = m.staticCall(timeLock, "DEFAULT_ADMIN_ROLE");
 
     // Grant PROPOSER_ROLE to Governor
-    m.call(timeLock, "grantRole", [PROPOSER_ROLE, governor]);
+    m.call(timeLock, "grantRole", [PROPOSER_ROLE, governor], {
+        id: "GrantProposerRole",
+    });
 
     // Grant EXECUTOR_ROLE to zero address (allows anyone to execute)
-    m.call(timeLock, "grantRole", [EXECUTOR_ROLE, "0x0000000000000000000000000000000000000000"]);
+    m.call(timeLock, "grantRole", [EXECUTOR_ROLE, "0x0000000000000000000000000000000000000000"], {
+        id: "GrantExecutorRole",
+    });
 
     // Revoke ADMIN_ROLE from deployer (optional but recommended for full decentralization)
-    // Uncomment the line below if you want to fully renounce admin control
-    // m.call(timeLock, "revokeRole", [ADMIN_ROLE, m.getAccount(0)]);
+    // Uncomment the lines below if you want to fully renounce admin control
+    // m.call(timeLock, "revokeRole", [ADMIN_ROLE, m.getAccount(0)], {
+    //   id: "RevokeAdminRole"
+    // });
 
     return {
         governanceToken,
