@@ -211,10 +211,10 @@ yarn hardhat run scripts/queue-and-execute.ts --network localhost
 
 ### Testnet Deployment
 
-Deploy to Sepolia testnet:
+Deploy to Sepolia testnet & verify source code:
 
 ```bash
-yarn hardhat run scripts/deploy.ts --network sepolia
+yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts --network sepolia --verify
 ```
 
 ### Mainnet Deployment
@@ -223,14 +223,8 @@ yarn hardhat run scripts/deploy.ts --network sepolia
 2. Verify all contract parameters
 3. Deploy:
 
-    ```bash
-    yarn hardhat run scripts/deploy.ts --network mainnet
-    ```
-
-4. Verify contracts on Etherscan:
-
 ```bash
-yarn hardhat verify --network mainnet DEPLOYED_CONTRACT_ADDRESS
+yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts --network mainnet --verify
 ```
 
 ## Tools & Resources
