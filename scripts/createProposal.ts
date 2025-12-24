@@ -1,6 +1,13 @@
 import { ethers } from "hardhat";
 import "dotenv/config";
 
+/**
+ * Interact with DAO on testnet/mainnet (no time manipulation)
+ * This script will perform actions but you'll need to wait for real blocks/time to pass
+ *
+ * Run with:
+ * npx hardhat run scripts/interact-testnet.ts --network sepolia
+ */
 async function main() {
     const [deployer] = await ethers.getSigners();
 
@@ -28,13 +35,22 @@ async function main() {
     console.log("- Box:", await box.getAddress());
     console.log("");
 
+    // Get governance parameters
+    const votingDelay = await governor.votingDelay();
+    const votingPeriod = await governor.votingPeriod();
+    const minDelay = await timeLock.getMinDelay();
+
+    console.log("Governance Parameters:");
+    console.log(`- Voting Delay: ${votingDelay} blocks (~${Number(votingDelay) * 12} seconds)`);
+    console.log(`- Voting Period: ${votingPeriod} blocks (~${Number(votingPeriod) * 12} seconds)`);
+    console.log(`- TimeLock Delay: ${minDelay} seconds`);
+    console.log("");
+
     // Step 1: Delegate votes to yourself
     console.log("Step 1: Delegating votes...");
     const delegateTx = await governanceToken.delegate(deployer.address);
     await delegateTx.wait();
 
-    // Get current block number for voting power check
-    const currentBlock = await ethers.provider.getBlockNumber();
     const votingPower = await governanceToken.getVotes(deployer.address);
     console.log(`✅ Voting power: ${ethers.formatEther(votingPower)} votes`);
     console.log("");
@@ -76,72 +92,29 @@ async function main() {
     console.log(`✅ Proposal created with ID: ${proposalId}`);
     console.log("");
 
-    // Step 3: Wait for voting delay (mine blocks if on local network)
-    console.log("Step 3: Waiting for voting period to start...");
-    const votingDelay = await governor.votingDelay();
-    console.log(`Mining ${votingDelay} blocks...`);
+    // Check proposal state
+    const currentBlock = await ethers.provider.getBlockNumber();
+    const proposalSnapshot = await governor.proposalSnapshot(proposalId);
+    const proposalDeadline = await governor.proposalDeadline(proposalId);
 
-    for (let i = 0; i < Number(votingDelay); i++) {
-        await ethers.provider.send("evm_mine", []);
-    }
-    console.log("✅ Voting period started");
+    console.log("Proposal Timeline:");
+    console.log(`- Current Block: ${currentBlock}`);
+    console.log(`- Voting Starts at Block: ${proposalSnapshot}`);
+    console.log(`- Voting Ends at Block: ${proposalDeadline}`);
+    console.log(`- Blocks until voting starts: ${Number(proposalSnapshot) - currentBlock}`);
     console.log("");
 
-    // Step 4: Vote on the proposal
-    console.log("Step 4: Voting on proposal...");
-    const voteTx = await governor.castVote(proposalId, 1); // 1 = For, 0 = Against, 2 = Abstain
-    await voteTx.wait();
-    console.log("✅ Vote cast: FOR");
+    console.log("⏰ NEXT STEPS:");
+    console.log(`1. Wait for block ${proposalSnapshot} (voting delay)`);
+    console.log(`2. Run the vote script: npx hardhat run scripts/vote.ts --network sepolia`);
+    console.log(`3. Wait for block ${proposalDeadline} (voting period ends)`);
+    console.log(`4. Run the queue script: npx hardhat run scripts/queue.ts --network sepolia`);
+    console.log(`5. Wait ${minDelay} seconds after queuing`);
+    console.log(`6. Run the execute script: npx hardhat run scripts/execute.ts --network sepolia`);
     console.log("");
 
-    // Step 5: Wait for voting period to end
-    console.log("Step 5: Waiting for voting period to end...");
-    const votingPeriod = await governor.votingPeriod();
-    console.log(`Mining ${votingPeriod} blocks...`);
-
-    for (let i = 0; i < Number(votingPeriod); i++) {
-        await ethers.provider.send("evm_mine", []);
-    }
-    console.log("✅ Voting period ended");
-    console.log("");
-
-    // Step 6: Queue the proposal
-    console.log("Step 6: Queueing proposal...");
-    const descriptionHash = ethers.id(`Proposal: Store ${newValue} in the Box`);
-
-    const queueTx = await governor.queue([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash);
-    await queueTx.wait();
-    console.log("✅ Proposal queued in TimeLock");
-    console.log("");
-
-    // Step 7: Wait for TimeLock delay
-    console.log("Step 7: Waiting for TimeLock delay...");
-    const minDelay = await timeLock.getMinDelay();
-    console.log(`Advancing time by ${minDelay} seconds...`);
-
-    await ethers.provider.send("evm_increaseTime", [Number(minDelay)]);
-    await ethers.provider.send("evm_mine", []);
-    console.log("✅ TimeLock delay passed");
-    console.log("");
-
-    // Step 8: Execute the proposal
-    console.log("Step 8: Executing proposal...");
-    const executeTx = await governor.execute([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash);
-    await executeTx.wait();
-    console.log("✅ Proposal executed!");
-    console.log("");
-
-    // Step 9: Verify the change
-    console.log("Step 9: Verifying result...");
-    const storedValue = await box.retrieve();
-    console.log(`Box value is now: ${storedValue}`);
-    console.log("");
-
-    if (storedValue === BigInt(newValue)) {
-        console.log("🎉 SUCCESS! The DAO successfully changed the Box value!");
-    } else {
-        console.log("❌ Something went wrong...");
-    }
+    console.log("💡 TIP: Save this proposal ID for later steps:");
+    console.log(`PROPOSAL_ID=${proposalId}`);
 }
 
 main()
