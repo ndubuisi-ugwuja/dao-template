@@ -113,12 +113,6 @@ cd dao-template
 yarn install
 ```
 
-**Create environment file:**
-
-```bash
-cp .env.example .env
-```
-
 **Configure your `.env` file with required variables:**
 
 ```env
@@ -157,12 +151,12 @@ REPORT_GAS=true yarn hardhat test
 yarn hardhat node
 ```
 
-#### Step 2: Deploy Contracts
+#### Step 2: Deploy Contracts to hardhat
 
 In a new terminal:
 
 ```bash
-yarn hardhat run scripts/deploy.ts --network localhost
+yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts
 ```
 
 #### Step 3: Create a Proposal
@@ -212,6 +206,10 @@ yarn hardhat run scripts/queue-and-execute.ts --network localhost
     - Changes take effect on-chain
 
 ## Deployment
+
+```bash
+yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts
+```
 
 ### Testnet Deployment
 
