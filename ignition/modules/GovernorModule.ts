@@ -9,7 +9,7 @@ const GovernorModule = buildModule("GovernorModule", (m) => {
 
     // Governor parameters
     const votingDelay = m.getParameter("votingDelay", 1); // 1 block
-    const votingPeriod = m.getParameter("votingPeriod", 5); // 1 minutes for testing purpose
+    const votingPeriod = m.getParameter("votingPeriod", 5); // 1 minutes for testing purpose (normally this should be set to 7 days)
     const quorumPercentage = m.getParameter("quorumPercentage", 4); // 4%
 
     // Deploy Governor
