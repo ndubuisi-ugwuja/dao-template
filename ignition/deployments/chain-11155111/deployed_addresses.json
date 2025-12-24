@@ -1,6 +1,6 @@
 {
-  "GovernanceTokenModule#GovernanceToken": "0xA080cc576baADB3836AF15C208e6Eb923AC03Fb2",
-  "TimeLockModule#TimeLock": "0x7341Af5bE714a4056AD6447a40F2146575345f1E",
-  "BoxModule#Box": "0x9F5676b4D7Cd828d1134C1cd2AE4a4c436B544e6",
-  "GovernorModule#GovernorContract": "0xcc75Bc28906735d349e0b62EA9f99aA9d6a07b5a"
+  "GovernanceTokenModule#GovernanceToken": "0x986d37E28bEabF0d890F679858116f1231E1697b",
+  "TimeLockModule#TimeLock": "0xda21308b06D8e925c879C5Ac277be3Fe274f5b03",
+  "BoxModule#Box": "0x9057280cFb91ca318F8e3219Be4D826Aaba992fc",
+  "GovernorModule#GovernorContract": "0x4b4636091Ac4dFa5460b3f60d98d8E9c19B8FBc9"
 }
