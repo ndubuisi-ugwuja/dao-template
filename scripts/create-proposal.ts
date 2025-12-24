@@ -2,27 +2,23 @@ import { ethers } from "hardhat";
 import "dotenv/config";
 
 /**
- * Interact with DAO on testnet/mainnet (no time manipulation)
- * This script will perform actions but you'll need to wait for real blocks/time to pass
+ * Create a proposal
+ * Run with: npx hardhat run scripts/create-proposal.ts --network sepolia
  *
- * Run with:
- * npx hardhat run scripts/interact-testnet.ts --network sepolia
+ * PREREQUISITE: Must have delegated votes at least 1 block ago!
  */
 async function main() {
     const [deployer] = await ethers.getSigners();
 
-    // Get addresses from environment variables
-    const GOVERNANCE_TOKEN_ADDRESS = process.env.GOVERNANCE_TOKEN_ADDRESS;
     const GOVERNOR_ADDRESS = process.env.GOVERNOR_ADDRESS;
-    const TIMELOCK_ADDRESS = process.env.TIMELOCK_ADDRESS;
     const BOX_ADDRESS = process.env.BOX_ADDRESS;
+    const GOVERNANCE_TOKEN_ADDRESS = process.env.GOVERNANCE_TOKEN_ADDRESS;
+    const TIMELOCK_ADDRESS = process.env.TIMELOCK_ADDRESS;
 
-    // Validate addresses exist
-    if (!GOVERNANCE_TOKEN_ADDRESS || !GOVERNOR_ADDRESS || !TIMELOCK_ADDRESS || !BOX_ADDRESS) {
-        throw new Error("Missing contract addresses in environment variables");
+    if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !GOVERNANCE_TOKEN_ADDRESS || !TIMELOCK_ADDRESS) {
+        throw new Error("Missing environment variables");
     }
 
-    // Get contract instances
     const governanceToken = await ethers.getContractAt("GovernanceToken", GOVERNANCE_TOKEN_ADDRESS);
     const governor = await ethers.getContractAt("GovernorContract", GOVERNOR_ADDRESS);
     const timeLock = await ethers.getContractAt("TimeLock", TIMELOCK_ADDRESS);
@@ -33,6 +29,42 @@ async function main() {
     console.log("- Governor:", await governor.getAddress());
     console.log("- TimeLock:", await timeLock.getAddress());
     console.log("- Box:", await box.getAddress());
+    console.log("");
+
+    // Check eligibility
+    const currentBlock = await ethers.provider.getBlockNumber();
+    const votingPower = await governanceToken.getVotes(deployer.address);
+    const proposalThreshold = await governor.proposalThreshold();
+
+    console.log("Proposal Eligibility Check:");
+    console.log("- Current block:", currentBlock);
+    console.log("- Your voting power:", ethers.formatEther(votingPower));
+    console.log("- Threshold required:", ethers.formatEther(proposalThreshold));
+
+    if (votingPower < proposalThreshold) {
+        throw new Error("Not enough voting power to create proposal!");
+    }
+
+    // Check past voting power (what will actually be used)
+    if (currentBlock > 0) {
+        try {
+            const pastVotingPower = await governanceToken.getPastVotes(deployer.address, currentBlock - 1);
+            console.log("- Voting power at previous block:", ethers.formatEther(pastVotingPower));
+
+            if (pastVotingPower < proposalThreshold) {
+                throw new Error(
+                    "You delegated too recently! Your voting power at the previous block is insufficient. " +
+                        "Wait 1-2 more blocks and try again.",
+                );
+            }
+        } catch (e: any) {
+            if (e.message.includes("delegated too recently")) {
+                throw e;
+            }
+            console.log("- Could not check past voting power (might be okay if recently delegated)");
+        }
+    }
+    console.log("✅ Eligible to propose!");
     console.log("");
 
     // Get governance parameters
@@ -46,17 +78,8 @@ async function main() {
     console.log(`- TimeLock Delay: ${minDelay} seconds`);
     console.log("");
 
-    // Step 1: Delegate votes to yourself
-    console.log("Step 1: Delegating votes...");
-    const delegateTx = await governanceToken.delegate(deployer.address);
-    await delegateTx.wait();
-
-    const votingPower = await governanceToken.getVotes(deployer.address);
-    console.log(`✅ Voting power: ${ethers.formatEther(votingPower)} votes`);
-    console.log("");
-
-    // Step 2: Create a proposal to change Box value
-    console.log("Step 2: Creating proposal...");
+    // Create proposal
+    console.log("Creating proposal...");
     const newValue = 77;
     const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
 
@@ -69,11 +92,11 @@ async function main() {
 
     const proposeReceipt = await proposeTx.wait();
 
-    // Get proposal ID from the event
     if (!proposeReceipt) {
         throw new Error("Proposal transaction failed");
     }
 
+    // Get proposal ID from event
     const proposalCreatedEvent = proposeReceipt.logs.find((log: any) => {
         try {
             return governor.interface.parseLog(log)?.name === "ProposalCreated";
@@ -92,8 +115,7 @@ async function main() {
     console.log(`✅ Proposal created with ID: ${proposalId}`);
     console.log("");
 
-    // Check proposal state
-    const currentBlock = await ethers.provider.getBlockNumber();
+    // Show timeline
     const proposalSnapshot = await governor.proposalSnapshot(proposalId);
     const proposalDeadline = await governor.proposalDeadline(proposalId);
 
@@ -106,14 +128,13 @@ async function main() {
 
     console.log("⏰ NEXT STEPS:");
     console.log(`1. Wait for block ${proposalSnapshot} (voting delay)`);
-    console.log(`2. Run the vote script: npx hardhat run scripts/vote.ts --network sepolia`);
+    console.log(`2. Run: npx hardhat run scripts/vote.ts --network sepolia`);
     console.log(`3. Wait for block ${proposalDeadline} (voting period ends)`);
-    console.log(`4. Run the queue script: npx hardhat run scripts/queue.ts --network sepolia`);
+    console.log(`4. Run: npx hardhat run scripts/queue.ts --network sepolia`);
     console.log(`5. Wait ${minDelay} seconds after queuing`);
-    console.log(`6. Run the execute script: npx hardhat run scripts/execute.ts --network sepolia`);
+    console.log(`6. Run: npx hardhat run scripts/execute.ts --network sepolia`);
     console.log("");
-
-    console.log("💡 TIP: Save this proposal ID for later steps:");
+    console.log("💡 Add this to your .env file:");
     console.log(`PROPOSAL_ID=${proposalId}`);
 }
 
