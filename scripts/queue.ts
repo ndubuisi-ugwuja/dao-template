@@ -23,11 +23,11 @@ async function main() {
     // Check proposal state
     const state = await governor.state(PROPOSAL_ID);
     const stateNames = ["Pending", "Active", "Canceled", "Defeated", "Succeeded", "Queued", "Expired", "Executed"];
-    console.log(`Current proposal state: ${stateNames[state]}`);
+    console.log(`Current proposal state: ${stateNames[Number(state)]}`);
 
     if (state !== 4n) {
         // 4 = Succeeded
-        throw new Error(`Proposal has not succeeded yet. Current state: ${stateNames[state]}`);
+        throw new Error(`Proposal has not succeeded yet. Current state: ${stateNames[Number(state)]}`);
     }
 
     // Queue the proposal

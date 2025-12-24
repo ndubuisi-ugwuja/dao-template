@@ -23,11 +23,11 @@ async function main() {
     // Check proposal state
     const state = await governor.state(PROPOSAL_ID);
     const stateNames = ["Pending", "Active", "Canceled", "Defeated", "Succeeded", "Queued", "Expired", "Executed"];
-    console.log(`Current proposal state: ${stateNames[state]}`);
+    console.log(`Current proposal state: ${stateNames[Number(state)]}`);
 
     if (state !== 5n) {
         // 5 = Queued
-        throw new Error(`Proposal is not queued. Current state: ${stateNames[state]}`);
+        throw new Error(`Proposal is not queued. Current state: ${stateNames[Number(state)]}`);
     }
 
     // Execute the proposal

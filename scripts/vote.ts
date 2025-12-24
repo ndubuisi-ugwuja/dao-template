@@ -21,11 +21,11 @@ async function main() {
     // Check if voting is active
     const state = await governor.state(PROPOSAL_ID);
     const stateNames = ["Pending", "Active", "Canceled", "Defeated", "Succeeded", "Queued", "Expired", "Executed"];
-    console.log(`Current proposal state: ${stateNames[state]}`);
+    console.log(`Current proposal state: ${stateNames[Number(state)]}`);
 
     if (state !== 1n) {
         // 1 = Active
-        throw new Error(`Proposal is not active. Current state: ${stateNames[state]}`);
+        throw new Error(`Proposal is not active. Current state: ${stateNames[Number(state)]}`);
     }
 
     // Cast vote: 0 = Against, 1 = For, 2 = Abstain
