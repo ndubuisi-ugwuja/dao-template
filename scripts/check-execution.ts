@@ -61,7 +61,6 @@ async function main() {
     const BOX_ADDRESS = process.env.BOX_ADDRESS;
     if (BOX_ADDRESS) {
         const ourEvents = scheduledEvents.filter((e) => e.args?.[1]?.toLowerCase() === BOX_ADDRESS.toLowerCase());
-
         if (ourEvents.length > 0) {
             console.log("");
             console.log(`✅ Found ${ourEvents.length} CallScheduled event(s) for Box contract:`);
