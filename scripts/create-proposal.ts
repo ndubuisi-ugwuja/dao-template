@@ -80,7 +80,7 @@ async function main() {
 
     // Create proposal
     console.log("Creating proposal...");
-    const newValue = 77;
+    const newValue = 100;
     const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
 
     const proposeTx = await governor.propose(
