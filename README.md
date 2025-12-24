@@ -125,6 +125,10 @@ cp .env.example .env
 PRIVATE_KEY=your_private_key_here
 SEPOLIA_RPC_URL=your_rpc_url_here
 ETHERSCAN_API_KEY=your_etherscan_api_key_here
+GOVERNANCE_TOKEN_ADDRESS=your_deployed_address
+GOVERNOR_ADDRESS=your_deployed_address
+TIMELOCK_ADDRESS=your_deployed_address
+BOX_ADDRESS=your_deployed_address
 ```
 
 > ⚠️ **Security Warning**: Never commit your `.env` file or expose your private keys publicly.
