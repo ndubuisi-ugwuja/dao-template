@@ -9,6 +9,7 @@ async function main() {
     const GOVERNOR_ADDRESS = process.env.GOVERNOR_ADDRESS;
     const BOX_ADDRESS = process.env.BOX_ADDRESS;
     const PROPOSAL_ID = process.env.PROPOSAL_ID;
+    const NEW_VALUE = process.env.NEW_VALUE || "99"; // Get from env or default to 99
 
     if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !PROPOSAL_ID) {
         throw new Error("Missing required environment variables");
@@ -18,6 +19,7 @@ async function main() {
     const box = await ethers.getContractAt("Box", BOX_ADDRESS);
 
     console.log("Queueing proposal:", PROPOSAL_ID);
+    console.log("Using value:", NEW_VALUE);
     console.log("");
 
     // Check proposal state
@@ -31,7 +33,7 @@ async function main() {
     }
 
     // Queue the proposal
-    const newValue = 77;
+    const newValue = parseInt(NEW_VALUE);
     const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
     const descriptionHash = ethers.id(`Proposal: Store ${newValue} in the Box`);
 

@@ -80,7 +80,7 @@ async function main() {
 
     // Create proposal
     console.log("Creating proposal...");
-    const newValue = 100;
+    const newValue = 125;
     const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
 
     const proposeTx = await governor.propose(
@@ -128,11 +128,11 @@ async function main() {
 
     console.log("⏰ NEXT STEPS:");
     console.log(`1. Wait for block ${proposalSnapshot} (voting delay)`);
-    console.log(`2. Run: npx hardhat run scripts/vote.ts --network sepolia`);
+    console.log(`2. Run: yarn hardhat run scripts/vote.ts --network sepolia`);
     console.log(`3. Wait for block ${proposalDeadline} (voting period ends)`);
-    console.log(`4. Run: npx hardhat run scripts/queue.ts --network sepolia`);
+    console.log(`4. Run: yarn hardhat run scripts/queue.ts --network sepolia`);
     console.log(`5. Wait ${minDelay} seconds after queuing`);
-    console.log(`6. Run: npx hardhat run scripts/execute.ts --network sepolia`);
+    console.log(`6. Run: yarn hardhat run scripts/execute.ts --network sepolia`);
     console.log("");
     console.log("💡 Add this to your .env file:");
     console.log(`PROPOSAL_ID=${proposalId}`);
