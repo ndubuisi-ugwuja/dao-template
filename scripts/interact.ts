@@ -1,16 +1,18 @@
 import { ethers } from "hardhat";
 
-/**
- * Example script to interact with deployed DAO
- * Run with: npx hardhat run scripts/interact-with-dao.ts --network localhost
- */
 async function main() {
     const [deployer] = await ethers.getSigners();
 
-    const { GOVERNANCE_TOKEN_ADDRESS } = process.env;
-    const { GOVERNOR_ADDRESS } = process.env;
-    const { TIMELOCK_ADDRESS } = process.env;
-    const { BOX_ADDRESS } = process.env;
+    // Get addresses from environment variables
+    const GOVERNANCE_TOKEN_ADDRESS = process.env.GOVERNANCE_TOKEN_ADDRESS;
+    const GOVERNOR_ADDRESS = process.env.GOVERNOR_ADDRESS;
+    const TIMELOCK_ADDRESS = process.env.TIMELOCK_ADDRESS;
+    const BOX_ADDRESS = process.env.BOX_ADDRESS;
+
+    // Validate addresses exist
+    if (!GOVERNANCE_TOKEN_ADDRESS || !GOVERNOR_ADDRESS || !TIMELOCK_ADDRESS || !BOX_ADDRESS) {
+        throw new Error("Missing contract addresses in environment variables");
+    }
 
     // Get contract instances
     const governanceToken = await ethers.getContractAt("GovernanceToken", GOVERNANCE_TOKEN_ADDRESS);
@@ -30,6 +32,8 @@ async function main() {
     const delegateTx = await governanceToken.delegate(deployer.address);
     await delegateTx.wait();
 
+    // Get current block number for voting power check
+    const currentBlock = await ethers.provider.getBlockNumber();
     const votingPower = await governanceToken.getVotes(deployer.address);
     console.log(`✅ Voting power: ${ethers.formatEther(votingPower)} votes`);
     console.log("");
@@ -47,7 +51,26 @@ async function main() {
     );
 
     const proposeReceipt = await proposeTx.wait();
-    const proposalId = proposeReceipt?.logs[0].topics[1];
+
+    // Get proposal ID from the event
+    if (!proposeReceipt) {
+        throw new Error("Proposal transaction failed");
+    }
+
+    const proposalCreatedEvent = proposeReceipt.logs.find((log: any) => {
+        try {
+            return governor.interface.parseLog(log)?.name === "ProposalCreated";
+        } catch {
+            return false;
+        }
+    });
+
+    if (!proposalCreatedEvent) {
+        throw new Error("ProposalCreated event not found");
+    }
+
+    const parsedEvent = governor.interface.parseLog(proposalCreatedEvent);
+    const proposalId = parsedEvent?.args[0];
 
     console.log(`✅ Proposal created with ID: ${proposalId}`);
     console.log("");
