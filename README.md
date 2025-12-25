@@ -5,7 +5,7 @@ A production-ready decentralized autonomous organization (DAO) built with OpenZe
 [![Hardhat](https://img.shields.io/badge/Built%20with-Hardhat-yellow.svg)](https://hardhat.org/)
 [![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.5.0-blue.svg)](https://www.openzeppelin.com/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.28-orange.svg)](https://soliditylang.org/)
-[![License](https://img.shields.io/badge/License-UNLICENSED-red.svg)](https://)
+[![License](https://img.shields.io/badge/License-UNLICENSED-red.svg)](https://soliditylang.org/)
 
 ## 📋 Table of Contents
 
