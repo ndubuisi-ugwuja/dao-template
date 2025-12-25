@@ -11,13 +11,11 @@ A production-ready decentralized autonomous organization (DAO) built with OpenZe
 
 - [Overview](#-overview)
 - [Features](#-features)
-- [Architecture](️-architecture)
 - [Contracts](#-contracts)
 - [Getting Started](#-getting-started)
 - [Deployment](#-deployment)
 - [Testing](#-testing)
 - [Usage](#-usage)
-- [Configuration](-configuration)
 - [Security](#-security)
 - [Contributing](#-contributing)
 - [License](#-license)
