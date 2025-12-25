@@ -31,8 +31,12 @@ async function main() {
     const currentBlock = await ethers.provider.getBlockNumber();
     const fromBlock = Math.max(0, Number(snapshot) - 100); // Search from a bit before proposal
 
-    const queuedFilter = governor.filters.ProposalQueued(PROPOSAL_ID);
-    const queuedEvents = await governor.queryFilter(queuedFilter, fromBlock, currentBlock);
+    // Don't filter by proposalId since it's not indexed - get all and filter manually
+    const queuedFilter = governor.filters.ProposalQueued();
+    const allQueuedEvents = await governor.queryFilter(queuedFilter, fromBlock, currentBlock);
+
+    // Filter for our specific proposal
+    const queuedEvents = allQueuedEvents.filter((e) => e.args?.[0]?.toString() === PROPOSAL_ID);
 
     if (queuedEvents.length === 0) {
         console.log("❌ No ProposalQueued event found");
@@ -60,7 +64,14 @@ async function main() {
     // Try to find our specific operation
     const BOX_ADDRESS = process.env.BOX_ADDRESS;
     if (BOX_ADDRESS) {
-        const ourEvents = scheduledEvents.filter((e) => e.args?.[1]?.toLowerCase() === BOX_ADDRESS.toLowerCase());
+        const ourEvents = scheduledEvents.filter((e) => {
+            const target = e.args?.[1];
+            if (target) {
+                return String(target).toLowerCase() === BOX_ADDRESS.toLowerCase();
+            }
+            return false;
+        });
+
         if (ourEvents.length > 0) {
             console.log("");
             console.log(`✅ Found ${ourEvents.length} CallScheduled event(s) for Box contract:`);
@@ -88,8 +99,10 @@ async function main() {
 
     if (
         queuedEvents.length > 0 &&
-        scheduledEvents.filter((e) => e.args?.[1]?.toLowerCase() === process.env.BOX_ADDRESS?.toLowerCase()).length ===
-            0
+        scheduledEvents.filter((e) => {
+            const target = e.args?.[1];
+            return target && String(target).toLowerCase() === process.env.BOX_ADDRESS?.toLowerCase();
+        }).length === 0
     ) {
         console.log("The proposal was marked as Queued by the Governor,");
         console.log("but the TimeLock never received the schedule call.");
