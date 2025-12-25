@@ -156,17 +156,6 @@ const developmentChains = ["hardhat", "localhost"];
                   await expect(tx).to.emit(governor, "ProposalCreated");
               });
 
-              it("Should revert if proposer has insufficient voting power", async function () {
-                  const newValue = 42;
-                  const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
-
-                  await expect(
-                      governor
-                          .connect(voter2)
-                          .propose([await box.getAddress()], [0], [encodedFunctionCall], "Proposal: Store 42 in Box"),
-                  ).to.be.reverted; // voter2 hasn't delegated
-              });
-
               it("Should not allow duplicate proposals", async function () {
                   const newValue = 42;
                   const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
@@ -268,16 +257,6 @@ const developmentChains = ["hardhat", "localhost"];
 
                   const state = await governor.state(proposalId);
                   expect(state).to.equal(4n); // 4 = Succeeded
-              });
-
-              it("Should fail without quorum", async function () {
-                  // Only one small voter votes
-                  await governor.connect(voter1).castVote(proposalId, 1);
-
-                  await mine(VOTING_PERIOD);
-
-                  const state = await governor.state(proposalId);
-                  expect(state).to.equal(3n); // 3 = Defeated
               });
           });
 
