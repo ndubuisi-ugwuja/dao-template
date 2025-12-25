@@ -3,17 +3,18 @@ import "dotenv/config";
 
 /**
  * Create a proposal
- * Run with: npx hardhat run scripts/create-proposal.ts --network sepolia
+ * Run with: yarn hardhat run scripts/create-proposal.ts --network sepolia
  *
  * PREREQUISITE: Must have delegated votes at least 1 block ago!
  */
 async function main() {
     const [deployer] = await ethers.getSigners();
 
-    const GOVERNOR_ADDRESS = process.env.GOVERNOR_ADDRESS;
-    const BOX_ADDRESS = process.env.BOX_ADDRESS;
-    const GOVERNANCE_TOKEN_ADDRESS = process.env.GOVERNANCE_TOKEN_ADDRESS;
-    const TIMELOCK_ADDRESS = process.env.TIMELOCK_ADDRESS;
+    const { GOVERNOR_ADDRESS } = process.env;
+    const { BOX_ADDRESS } = process.env;
+    const { GOVERNANCE_TOKEN_ADDRESS } = process.env;
+    const { TIMELOCK_ADDRESS } = process.env;
+    const { NEW_VALUE } = process.env;
 
     if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !GOVERNANCE_TOKEN_ADDRESS || !TIMELOCK_ADDRESS) {
         throw new Error("Missing environment variables");
@@ -80,14 +81,13 @@ async function main() {
 
     // Create proposal
     console.log("Creating proposal...");
-    const newValue = 130;
-    const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
+    const encodedFunctionCall = box.interface.encodeFunctionData("store", [NEW_VALUE]);
 
     const proposeTx = await governor.propose(
         [await box.getAddress()],
         [0],
         [encodedFunctionCall],
-        `Proposal: Store ${newValue} in the Box`,
+        `Proposal: Store ${NEW_VALUE} in the Box`,
     );
 
     const proposeReceipt = await proposeTx.wait();
