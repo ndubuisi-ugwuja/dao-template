@@ -3,11 +3,11 @@ import "dotenv/config";
 
 /**
  * Vote on a proposal
- * Run with: npx hardhat run scripts/vote.ts --network sepolia
+ * Run with: yarn hardhat run scripts/vote.ts --network sepolia
  */
 async function main() {
-    const GOVERNOR_ADDRESS = process.env.GOVERNOR_ADDRESS;
-    const PROPOSAL_ID = process.env.PROPOSAL_ID;
+    const { GOVERNOR_ADDRESS } = process.env;
+    const { PROPOSAL_ID } = process.env;
 
     if (!GOVERNOR_ADDRESS || !PROPOSAL_ID) {
         throw new Error("Missing GOVERNOR_ADDRESS or PROPOSAL_ID in environment variables");
