@@ -1,264 +1,496 @@
-# DAO Template
+# DAO Governance System
 
-A comprehensive smart contract template for building decentralized autonomous organizations (DAOs) with on-chain governance capabilities.
+A production-ready decentralized autonomous organization (DAO) built with OpenZeppelin's governance framework, featuring on-chain voting, proposal execution through a timelock, and comprehensive testing.
 
-## Table of Contents
+[![Hardhat](https://img.shields.io/badge/Built%20with-Hardhat-yellow.svg)](https://hardhat.org/)
+[![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.5.0-blue.svg)](https://www.openzeppelin.com/)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.28-orange.svg)](https://soliditylang.org/)
+[![License](https://img.shields.io/badge/License-UNLICENSED-red.svg)]()
+
+## 📋 Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
-- [Governance Models](#governance-models)
+- [Architecture](#architecture)
+- [Contracts](#contracts)
 - [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Testing](#testing)
 - [Deployment](#deployment)
-- [Tools & Resources](#tools--resources)
+- [Testing](#testing)
+- [Usage](#usage)
+- [Scripts](#scripts)
+- [Configuration](#configuration)
+- [Security](#security)
 - [Contributing](#contributing)
 - [License](#license)
-- [Author](#author)
 
-## Overview
+## 🎯 Overview
 
-This repository provides a production-ready foundation for creating DAOs with governance mechanisms. It includes smart contracts, deployment scripts, and examples demonstrating both on-chain and hybrid governance patterns.
+This DAO governance system enables token holders to collectively make decisions through on-chain proposals and voting. The system uses a timelock mechanism to ensure a delay between proposal approval and execution, providing time for stakeholders to react to governance decisions.
 
-### Key Components
+**Key Components:**
 
-- **Governance Token (ERC20)**: Token-based voting rights for DAO members
-- **Governor Contract**: Handles proposal creation, voting, and execution
-- **Timelock Controller**: Enforces a delay between proposal approval and execution
-- **Example Contracts**: Sample contracts (Box) to demonstrate governance in action
+- **GovernanceToken**: ERC20 token with voting capabilities (ERC20Votes)
+- **Governor**: Main governance contract for proposals and voting
+- **TimeLock**: Enforces execution delays on approved proposals
+- **Box**: Example governance-controlled contract
 
-## Features
+## ✨ Features
 
-- ✅ OpenZeppelin-based governance contracts
-- ✅ Timelock mechanism for proposal execution
-- ✅ Comprehensive test suite
-- ✅ Ready-to-use deployment scripts
-- ✅ Examples of proposal lifecycle (propose, vote, queue, execute)
-- ✅ Support for both on-chain and hybrid governance models
+- ✅ **On-chain Governance**: Fully decentralized decision-making
+- ✅ **Token-based Voting**: 1 token = 1 vote with delegation support
+- ✅ **Timelock Protection**: Mandatory delay before proposal execution
+- ✅ **Flexible Parameters**: Configurable voting periods, delays, and quorum
+- ✅ **OpenZeppelin Standard**: Battle-tested governance contracts
+- ✅ **Comprehensive Testing**: Unit tests and staging tests included
+- ✅ **Hardhat Ignition**: Declarative deployment system
+- ✅ **Multi-network Support**: Deploy to localhost, testnets, or mainnet
 
-## Governance Models
+## 🏗️ Architecture
 
-### On-Chain Governance
+```
+┌─────────────────┐
+│ GovernanceToken │ (ERC20Votes)
+└────────┬────────┘
+         │
+         │ voting power
+         ▼
+┌─────────────────┐      proposes       ┌──────────┐
+│    Governor     │ ──────────────────► │ TimeLock │
+│   (Proposals)   │                     │ (Delays) │
+└─────────────────┘                     └─────┬────┘
+                                              │
+                                              │ executes
+                                              ▼
+                                        ┌──────────┐
+                                        │   Box    │
+                                        │ (Target) │
+                                        └──────────┘
+```
 
-Fully decentralized governance where all voting and execution happens on the blockchain.
+### Governance Flow
 
-**Advantages:**
+1. **Delegate**: Token holders delegate voting power to themselves or others
+2. **Propose**: Users with sufficient voting power create proposals
+3. **Vote**: Token holders vote For/Against/Abstain during voting period
+4. **Queue**: Successful proposals are queued in the TimeLock
+5. **Execute**: After delay, anyone can execute queued proposals
 
-- Trustless execution
-- Complete transparency
-- No intermediaries required
+## 📜 Contracts
 
-**Tradeoffs:**
+### GovernanceToken.sol
 
-- Higher gas costs
-- Slower execution due to on-chain processing
+ERC20 token with voting capabilities using OpenZeppelin's ERC20Votes extension.
 
-**Example Flow:**
+- **Total Supply**: 1,000,000 tokens
+- **Voting**: Checkpoint-based voting power
+- **Delegation**: Required before voting
 
-1. Proposal created on-chain
-2. Token holders vote directly on the blockchain
-3. Approved proposals execute automatically via Timelock
-4. Used by projects like Compound and Uniswap
+### GovernorContract.sol
 
-### Hybrid Governance
+Main governance contract inheriting from multiple OpenZeppelin Governor extensions.
 
-Combines off-chain voting with on-chain execution for cost efficiency.
+- **Extensions**: Settings, CountingSimple, Votes, VotesQuorumFraction, TimelockControl
+- **Voting Delay**: Configurable delay before voting starts
+- **Voting Period**: Duration of voting
+- **Quorum**: Minimum percentage of votes required
 
-**Advantages:**
+### TimeLock.sol
 
-- Significantly lower gas costs
-- Faster voting process
-- Scalable for larger communities
+Timelock controller that enforces delays on proposal execution.
 
-**Tradeoffs:**
+- **Min Delay**: Minimum time between queue and execution
+- **Roles**: Proposer (Governor), Executor (anyone), Admin (self)
 
-- Requires oracle or trusted multisig for execution
-- Additional infrastructure needed
+### Box.sol
 
-**Implementation Options:**
+Example governance-controlled contract demonstrating DAO control.
 
-| Method         | Tool                   | Security Model                  |
-| -------------- | ---------------------- | ------------------------------- |
-| Oracle-based   | Chainlink              | Decentralized oracle network    |
-| Multisig-based | Gnosis Safe + Snapshot | Trusted signers execute results |
+- **Owner**: TimeLock contract (controlled by DAO)
+- **Function**: Stores a single value that only governance can change
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- [Node.js](https://nodejs.org/) (v14+ recommended)
-- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/)
-
-Verify installations:
-
-```bash
-git --version
-node --version
-yarn --version
-```
+- Node.js v18+ and npm/yarn
+- Basic understanding of Ethereum and Solidity
+- Testnet ETH for deployment (Sepolia recommended)
 
 ### Installation
 
-**Clone the repository:**
-
 ```bash
+# Clone the repository
 git clone https://github.com/ndubuisi-ugwuja/dao-template.git
 cd dao-template
-```
 
-**Install dependencies:**
-
-```bash
+# Install dependencies
 yarn install
+
+# Copy environment variables
+cp .env.example .env
 ```
 
-**Configure your `.env` file with required variables:**
+### Environment Setup
+
+Create a `.env` file with the following:
 
 ```env
+# Network Configuration
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
 PRIVATE_KEY=your_private_key_here
-SEPOLIA_RPC_URL=your_rpc_url_here
-ETHERSCAN_API_KEY=your_etherscan_api_key_here
-GOVERNANCE_TOKEN_ADDRESS=your_deployed_address
-GOVERNOR_ADDRESS=your_deployed_address
-TIMELOCK_ADDRESS=your_deployed_address
-BOX_ADDRESS=your_deployed_address
+ETHERSCAN_API_KEY=your_etherscan_api_key   // For etherscan Verification
+
+# Deployed Contract Addresses (after deployment)
+GOVERNANCE_TOKEN_ADDRESS=
+GOVERNOR_ADDRESS=
+TIMELOCK_ADDRESS=
+BOX_ADDRESS=
+
+# For proposals
+PROPOSAL_ID=
+NEW_VALUE=
+
 ```
 
-> ⚠️ **Security Warning**: Never commit your `.env` file or expose your private keys publicly.
-
-## Testing
-
-Run the complete test suite:
+### Compile Contracts
 
 ```bash
-yarn hardhat test
+yarn hardhat compile
 ```
 
-For detailed gas reporting:
+## 🌐 Deployment
+
+### Local Deployment (Testing)
 
 ```bash
-REPORT_GAS=true yarn hardhat test
-```
-
-## Usage
-
-### Local Development Workflow
-
-#### Step 1: Start Local Blockchain
-
-```bash
+# Start local Hardhat node
 yarn hardhat node
+
+# Deploy to localhost (in another terminal)
+yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts --network localhost
 ```
 
-#### Step 2: Deploy Contracts to hardhat
-
-In a new terminal:
+### Testnet Deployment (Sepolia)
 
 ```bash
-yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts
+# Deploy to Sepolia
+yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts --network sepolia
+
+# Verify contracts on Etherscan
+yarn hardhat ignition verify deployments/chain-11155111
 ```
 
-#### Step 3: Create a Proposal
+## 🧪 Testing
+
+### Unit Tests
+
+Run comprehensive unit tests on local Hardhat network:
 
 ```bash
-yarn hardhat run scripts/propose.ts --network localhost
+# Run all unit tests
+yarn hardhat test
+
+# Run with coverage
+yarn hardhat coverage
+
+# Run with gas reporting
+REPORT_GAS=true npx hardhat test
+
+# Run specific test file
+npx hardhat test test/DAO.test.ts
 ```
 
-This script proposes a new value for the Box contract.
+**Test Coverage:**
 
-#### Step 4: Vote on Proposal
+- ✅ 28+ unit tests
+- ✅ Deployment verification
+- ✅ Token delegation
+- ✅ Proposal creation
+- ✅ Voting mechanisms
+- ✅ Queueing and execution
+- ✅ Access control
+- ✅ End-to-end governance flow
+
+### Staging Tests
+
+Test deployed contracts on testnets:
 
 ```bash
-yarn hardhat run scripts/vote.ts --network localhost
+# Run staging tests on Sepolia
+npx hardhat test test/DAO.staging.test.ts --network sepolia
 ```
 
-#### Step 5: Queue and Execute
+**Staging Coverage:**
 
-After the voting period ends and the proposal passes:
+- ✅ 26+ staging tests
+- ✅ Deployment verification on testnet
+- ✅ Parameter validation
+- ✅ Role and access control checks
+- ✅ Integration testing
+- ✅ Safety checks
+
+## 💡 Usage
+
+### Complete Governance Workflow
+
+#### 1. Delegate Voting Power
 
 ```bash
-yarn hardhat run scripts/queue-and-execute.ts --network localhost
+# Delegate votes to yourself
+npx hardhat run scripts/delegate.ts --network sepolia
+
+# Wait 1-2 blocks for voting power to activate
 ```
 
-### Understanding the Process
-
-1. **Deploy Phase**:
-    - ERC20 governance token is deployed
-    - Timelock contract is deployed (holds all permissions)
-    - Governor contract is deployed (manages proposals)
-    - Box contract is deployed (owned by Timelock)
-
-2. **Propose Phase**:
-    - Create a proposal to change Box value
-    - Proposal enters pending state
-
-3. **Vote Phase**:
-    - Token holders vote (for, against, abstain)
-    - Voting period is defined in Governor contract
-
-4. **Queue Phase**:
-    - Successful proposals are queued in Timelock
-    - Delay period begins
-
-5. **Execute Phase**:
-    - After delay, anyone can execute the proposal
-    - Changes take effect on-chain
-
-## Deployment
+#### 2. Create a Proposal
 
 ```bash
-yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts
+# Create proposal with unique value
+npx hardhat run scripts/create-fresh-proposal.ts --network sepolia
+
+# Save the PROPOSAL_ID from output to .env
 ```
 
-### Testnet Deployment
-
-Deploy to Sepolia testnet & verify source code:
+#### 3. Vote on Proposal
 
 ```bash
-yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts --network sepolia --verify
+# Wait for voting delay to pass
+# Check current block: await ethers.provider.getBlockNumber()
+
+# Cast your vote
+npx hardhat run scripts/vote.ts --network sepolia
 ```
 
-### Mainnet Deployment
-
-1. Ensure sufficient ETH for gas fees
-2. Verify all contract parameters
-3. Deploy:
+#### 4. Queue Proposal
 
 ```bash
-yarn hardhat ignition deploy ignition/modules/FullDaoModule.ts --network mainnet --verify
+# Wait for voting period to end
+# Proposal must have succeeded (reached quorum)
+
+# Queue in TimeLock
+npx hardhat run scripts/queue.ts --network sepolia
 ```
 
-## Tools & Resources
+#### 5. Execute Proposal
 
-### Development Tools
+```bash
+# Wait for TimeLock delay (e.g., 300 seconds on Sepolia)
 
-- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/4.x/api/governance) - Secure governance primitives
-- [OpenZeppelin Wizard](https://wizard.openzeppelin.com/#governor) - Contract generation tool
-- [Hardhat](https://hardhat.org/) - Development environment
+# Execute the proposal
+npx hardhat run scripts/execute.ts --network sepolia
 
-### Governance Platforms
+# Or use debug script for detailed output
+npx hardhat run scripts/debug-execute.ts --network sepolia
+```
 
-- [Tally](https://www.withtally.com/) - On-chain governance interface
-- [Snapshot](https://snapshot.org/) - Off-chain voting platform
-- [Gnosis Safe](https://safe.global/) - Multisig wallet for hybrid governance
+### Localhost Workflow (Fast Testing)
 
-### No-Code DAO Solutions
+For rapid testing with time manipulation:
 
-- [Aragon](https://aragon.org/)
-- [DAOhaus](https://daohaus.club/)
-- [Colony](https://colony.io/)
-- [Syndicate](https://syndicate.io/)
+```bash
+# Start local node
+npx hardhat node
+
+# Deploy (in another terminal)
+npx hardhat ignition deploy ignition/modules/FullDaoModule.ts --network localhost --parameters ignition/parameters/localhost-params.json
+
+# Run complete flow (automatic time advancement)
+npx hardhat run scripts/interact-localhost.ts --network localhost
+```
+
+## 📝 Scripts
+
+### Utility Scripts
+
+| Script                     | Purpose                   | Usage                                                                |
+| -------------------------- | ------------------------- | -------------------------------------------------------------------- |
+| `delegate.ts`              | Delegate voting power     | `npx hardhat run scripts/delegate.ts --network sepolia`              |
+| `check-eligibility.ts`     | Check if can propose      | `npx hardhat run scripts/check-eligibility.ts --network sepolia`     |
+| `create-fresh-proposal.ts` | Create unique proposal    | `npx hardhat run scripts/create-fresh-proposal.ts --network sepolia` |
+| `vote.ts`                  | Cast vote on proposal     | `npx hardhat run scripts/vote.ts --network sepolia`                  |
+| `queue.ts`                 | Queue successful proposal | `npx hardhat run scripts/queue.ts --network sepolia`                 |
+| `execute.ts`               | Execute queued proposal   | `npx hardhat run scripts/execute.ts --network sepolia`               |
+
+### Debug Scripts
+
+| Script                         | Purpose                      | Usage                                                                    |
+| ------------------------------ | ---------------------------- | ------------------------------------------------------------------------ |
+| `check-roles.ts`               | Verify role setup            | `npx hardhat run scripts/check-roles.ts --network sepolia`               |
+| `check-execution-readiness.ts` | Check if ready to execute    | `npx hardhat run scripts/check-execution-readiness.ts --network sepolia` |
+| `debug-execute.ts`             | Execute with detailed errors | `npx hardhat run scripts/debug-execute.ts --network sepolia`             |
+| `get-operation-id.ts`          | Get TimeLock operation ID    | `npx hardhat run scripts/get-operation-id.ts --network sepolia`          |
+
+### Complete Flow Scripts
+
+| Script                  | Purpose                    | Network        |
+| ----------------------- | -------------------------- | -------------- |
+| `interact-localhost.ts` | Full automated flow        | Localhost only |
+| `interact-testnet.ts`   | Create proposal on testnet | Sepolia, etc.  |
+
+## ⚙️ Configuration
+
+### Hardhat Config
+
+Key configurations in `hardhat.config.ts`:
+
+```typescript
+const config: HardhatUserConfig = {
+    solidity: {
+        version: "0.8.28",
+        settings: {
+            evmVersion: "cancun", // Required for OpenZeppelin 5.5.0
+            optimizer: {
+                enabled: true,
+                runs: 200,
+            },
+        },
+    },
+    networks: {
+        sepolia: {
+            url: process.env.SEPOLIA_RPC_URL,
+            accounts: [process.env.PRIVATE_KEY],
+            chainId: 11155111,
+        },
+    },
+};
+```
+
+### Governance Parameters
+
+#### Voting Delay
+
+Blocks to wait before voting starts after proposal creation.
+
+- **Localhost**: 1 block (~12 seconds)
+- **Testnet**: 1 block (~12 seconds)
+- **Mainnet**: 7200 blocks (~1 day)
+
+#### Voting Period
+
+Duration of voting in blocks.
+
+- **Localhost**: 5 blocks (~1 minute)
+- **Testnet**: 300 blocks (~1 hour)
+- **Mainnet**: 50400 blocks (~7 days)
+
+#### Quorum Percentage
+
+Minimum percentage of total supply that must vote for proposal to pass.
+
+- **Default**: 4% of total supply
+
+#### TimeLock Delay
+
+Seconds to wait between queue and execution.
+
+- **Localhost**: 10 seconds
+- **Testnet**: 300 seconds (5 minutes)
+- **Mainnet**: 172800 seconds (2 days)
+
+## 🔒 Security
+
+### Access Control
+
+- **PROPOSER_ROLE**: Only Governor contract can propose to TimeLock
+- **EXECUTOR_ROLE**: Anyone can execute (address(0))
+- **DEFAULT_ADMIN_ROLE**: TimeLock is self-administered
+
+### Best Practices
+
+✅ **DO:**
+
+- Always test on testnet first
+- Verify contracts on Etherscan
+- Use multi-sig for critical operations
+- Document all governance parameters
+- Monitor proposal events
+- Keep private keys secure
+
+❌ **DON'T:**
+
+- Deploy to mainnet without testing
+- Share private keys
+- Use low gas limits
+- Skip timelock delays
+- Ignore failed transactions
+- Deploy with admin backdoors
+
+### Audit Recommendations
+
+Before mainnet deployment:
+
+1. Complete security audit by reputable firm
+2. Bug bounty program
+3. Formal verification of critical functions
+4. Emergency pause mechanism (if needed)
+5. Multi-sig control for admin functions
+
+## 📊 Gas Optimization
+
+Estimated gas costs on Ethereum mainnet:
+
+| Operation        | Gas Cost (est.) | USD Cost @ 30 gwei |
+| ---------------- | --------------- | ------------------ |
+| Deploy Full DAO  | ~5,000,000      | ~$150              |
+| Delegate         | ~150,000        | ~$4.50             |
+| Create Proposal  | ~200,000        | ~$6.00             |
+| Cast Vote        | ~100,000        | ~$3.00             |
+| Queue Proposal   | ~150,000        | ~$4.50             |
+| Execute Proposal | ~100,000        | ~$3.00             |
+
+_Costs are estimates and vary with gas prices_
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+**Issue**: "Cannot find module typechain-types"
+
+```bash
+# Solution: Compile contracts to generate TypeChain types
+npx hardhat compile
+```
+
+**Issue**: "execution reverted" when creating proposal
+
+```bash
+# Solution: Delegate votes and wait 1 block
+npx hardhat run scripts/delegate.ts --network sepolia
+# Wait 12-24 seconds, then create proposal
+```
+
+**Issue**: "Proposal is not queued" when executing
+
+```bash
+# Solution: Check if enough time has passed
+npx hardhat run scripts/check-execution-readiness.ts --network sepolia
+```
+
+**Issue**: TimeLock operation not registered
+
+```bash
+# Solution: Check if proposal was properly queued
+npx hardhat run scripts/check-queue-events.ts --network sepolia
+```
+
+## 📚 Resources
+
+### Documentation
+
+- [OpenZeppelin Governor](https://docs.openzeppelin.com/contracts/4.x/governance)
+- [Hardhat Documentation](https://hardhat.org/docs)
+- [Hardhat Ignition](https://hardhat.org/ignition/docs/getting-started)
+- [ERC20Votes](https://docs.openzeppelin.com/contracts/4.x/api/token/erc20#ERC20Votes)
 
 ### Learning Resources
 
 - [OpenZeppelin Governance Guide](https://docs.openzeppelin.com/contracts/4.x/governance)
-- [Vitalik on DAOs](https://blog.ethereum.org/2014/05/06/daos-dacs-das-and-more-an-incomplete-terminology-guide/)
-- [On-Chain Governance Analysis](https://vitalik.ca/general/2021/08/16/voting3.html)
+- [Compound Governance](https://compound.finance/governance)
+- [DAO Patterns](https://ethereum.org/en/dao/)
 
-## Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
+Contributions are welcome! Please follow these guidelines:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -266,27 +498,62 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Please ensure your code:
+### Development Setup
 
-- Passes all tests
-- Follows the existing code style
-- Includes appropriate documentation
+```bash
+# Install dependencies
+npm install
 
-## License
+# Run tests
+npm test
 
-This project is unlicensed and free to use.
+# Run linter
+npm run lint
 
-## Author
+# Format code
+npm run format
+```
 
-**Ndubuisi Ugwuja**  
-X: [@joovhie\_](https://x.com/joovhie_)
+## 📄 License
 
-## Acknowledgments
+This project is UNLICENSED. See the [LICENSE](LICENSE) file for details.
 
-- OpenZeppelin team for governance contracts and documentation
-- Compound Finance for pioneering on-chain governance
-- Patrick Collins for the original DAO template inspiration
+## 🙏 Acknowledgments
+
+- [OpenZeppelin](https://openzeppelin.com/) for secure smart contract libraries
+- [Hardhat](https://hardhat.org/) for development environment
+- [Ethereum](https://ethereum.org/) community for governance standards
+
+## 📞 Support
+
+For questions and support:
+
+- Open an issue on GitHub
+- Review existing documentation
+- Check troubleshooting guide
+
+## 🗺️ Roadmap
+
+- [ ] Add proposal cancellation functionality
+- [ ] Implement voting power snapshots
+- [ ] Create governance UI
+- [ ] Add proposal templates
+- [ ] Integrate with multisig wallets
+- [ ] Add proposal simulation tools
+- [ ] Create governance analytics dashboard
+
+## 📈 Version History
+
+### v1.0.0 (Current)
+
+- Initial release
+- Complete DAO implementation
+- Comprehensive testing suite
+- Deployment scripts
+- Documentation
 
 ---
 
-**Need Help?** Open an issue or reach out on X.
+**Built with ❤️ for decentralized governance**
+
+_Last Updated: December 2025_
