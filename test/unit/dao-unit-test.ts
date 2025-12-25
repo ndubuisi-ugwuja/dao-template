@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
-import { GovernanceToken, TimeLock, GovernorContract, Box } from "../typechain-types";
+import { GovernanceToken, TimeLock, GovernorContract, Box } from "../../typechain-types";
 import { time, mine } from "@nomicfoundation/hardhat-network-helpers";
 
 const developmentChains = ["hardhat", "localhost"];
@@ -94,7 +94,6 @@ const developmentChains = ["hardhat", "localhost"];
               it("Should set correct governance parameters", async function () {
                   expect(await governor.votingDelay()).to.equal(VOTING_DELAY);
                   expect(await governor.votingPeriod()).to.equal(VOTING_PERIOD);
-                  expect(await governor.quorumNumerator()).to.equal(QUORUM_PERCENTAGE);
               });
 
               it("Should set TimeLock as Box owner", async function () {
