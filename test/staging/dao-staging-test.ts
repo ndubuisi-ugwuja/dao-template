@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { ethers, network } from "hardhat";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { GovernanceToken, TimeLock, GovernorContract, Box } from "../../typechain-types";
+import "dotenv/config";
 
 /**
  * STAGING TESTS
