@@ -3,13 +3,13 @@ import "dotenv/config";
 
 /**
  * Execute a queued proposal
- * Run with: npx hardhat run scripts/execute.ts --network sepolia
+ * Run with: yarn hardhat run scripts/execute.ts --network sepolia
  */
 async function main() {
-    const GOVERNOR_ADDRESS = process.env.GOVERNOR_ADDRESS;
-    const BOX_ADDRESS = process.env.BOX_ADDRESS;
-    const PROPOSAL_ID = process.env.PROPOSAL_ID;
-    const NEW_VALUE = process.env.NEW_VALUE;
+    const { GOVERNOR_ADDRESS } = process.env;
+    const { BOX_ADDRESS } = process.env;
+    const { PROPOSAL_ID } = process.env;
+    const { NEW_VALUE } = process.env;
 
     if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !PROPOSAL_ID || !NEW_VALUE) {
         throw new Error("Missing required environment variables");
