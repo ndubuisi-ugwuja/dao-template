@@ -16,7 +16,7 @@ async function main() {
     const { TIMELOCK_ADDRESS } = process.env;
     const { NEW_VALUE } = process.env;
 
-    if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !GOVERNANCE_TOKEN_ADDRESS || !TIMELOCK_ADDRESS) {
+    if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !GOVERNANCE_TOKEN_ADDRESS || !TIMELOCK_ADDRESS || !NEW_VALUE) {
         throw new Error("Missing environment variables");
     }
 
