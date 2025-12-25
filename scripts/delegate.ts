@@ -3,7 +3,7 @@ import "dotenv/config";
 
 /**
  * Delegate voting power to yourself
- * Run with: npx hardhat run scripts/delegate.ts --network sepolia
+ * Run with: yarn hardhat run scripts/delegate.ts --network sepolia
  *
  * IMPORTANT: Wait 1-2 blocks after this before creating a proposal!
  */
