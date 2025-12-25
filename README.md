@@ -5,23 +5,23 @@ A production-ready decentralized autonomous organization (DAO) built with OpenZe
 [![Hardhat](https://img.shields.io/badge/Built%20with-Hardhat-yellow.svg)](https://hardhat.org/)
 [![OpenZeppelin](https://img.shields.io/badge/OpenZeppelin-5.5.0-blue.svg)](https://www.openzeppelin.com/)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.28-orange.svg)](https://soliditylang.org/)
-[![License](https://img.shields.io/badge/License-UNLICENSED-red.svg)]()
+[![License](https://img.shields.io/badge/License-UNLICENSED-red.svg)](https://)
 
 ## 📋 Table of Contents
 
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Contracts](#contracts)
-- [Getting Started](#getting-started)
-- [Deployment](#deployment)
-- [Testing](#testing)
-- [Usage](#usage)
-- [Scripts](#scripts)
-- [Configuration](#configuration)
-- [Security](#security)
-- [Contributing](#contributing)
-- [License](#license)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Architecture](#-architecture)
+- [Contracts](#-contracts)
+- [Getting Started](#-getting-started)
+- [Deployment](#-deployment)
+- [Testing](#-testing)
+- [Usage](#-usage)
+- [Scripts](#-scripts)
+- [Configuration](#-configuration)
+- [Security](#-security)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ## 🎯 Overview
 
@@ -47,7 +47,7 @@ This DAO governance system enables token holders to collectively make decisions 
 
 ## 🏗️ Architecture
 
-```
+```architecture
 ┌─────────────────┐
 │ GovernanceToken │ (ERC20Votes)
 └────────┬────────┘
@@ -194,22 +194,11 @@ yarn hardhat test
 yarn hardhat coverage
 
 # Run with gas reporting
-REPORT_GAS=true npx hardhat test
+REPORT_GAS=true yarn hardhat test
 
 # Run specific test file
-npx hardhat test test/DAO.test.ts
+yarn hardhat test test/dao-unit-test.ts
 ```
-
-**Test Coverage:**
-
-- ✅ 28+ unit tests
-- ✅ Deployment verification
-- ✅ Token delegation
-- ✅ Proposal creation
-- ✅ Voting mechanisms
-- ✅ Queueing and execution
-- ✅ Access control
-- ✅ End-to-end governance flow
 
 ### Staging Tests
 
@@ -217,17 +206,8 @@ Test deployed contracts on testnets:
 
 ```bash
 # Run staging tests on Sepolia
-npx hardhat test test/DAO.staging.test.ts --network sepolia
+yarn hardhat test --network sepolia
 ```
-
-**Staging Coverage:**
-
-- ✅ 26+ staging tests
-- ✅ Deployment verification on testnet
-- ✅ Parameter validation
-- ✅ Role and access control checks
-- ✅ Integration testing
-- ✅ Safety checks
 
 ## 💡 Usage
 
@@ -237,7 +217,7 @@ npx hardhat test test/DAO.staging.test.ts --network sepolia
 
 ```bash
 # Delegate votes to yourself
-npx hardhat run scripts/delegate.ts --network sepolia
+yarn hardhat run scripts/delegate.ts --network sepolia
 
 # Wait 1-2 blocks for voting power to activate
 ```
@@ -245,8 +225,8 @@ npx hardhat run scripts/delegate.ts --network sepolia
 #### 2. Create a Proposal
 
 ```bash
-# Create proposal with unique value
-npx hardhat run scripts/create-fresh-proposal.ts --network sepolia
+# Create proposal with unique value set in your .env
+yarn hardhat run scripts/create-proposal.ts --network sepolia
 
 # Save the PROPOSAL_ID from output to .env
 ```
@@ -258,7 +238,7 @@ npx hardhat run scripts/create-fresh-proposal.ts --network sepolia
 # Check current block: await ethers.provider.getBlockNumber()
 
 # Cast your vote
-npx hardhat run scripts/vote.ts --network sepolia
+yarn hardhat run scripts/vote.ts --network sepolia
 ```
 
 #### 4. Queue Proposal
@@ -268,7 +248,7 @@ npx hardhat run scripts/vote.ts --network sepolia
 # Proposal must have succeeded (reached quorum)
 
 # Queue in TimeLock
-npx hardhat run scripts/queue.ts --network sepolia
+yarn hardhat run scripts/queue.ts --network sepolia
 ```
 
 #### 5. Execute Proposal
@@ -277,55 +257,8 @@ npx hardhat run scripts/queue.ts --network sepolia
 # Wait for TimeLock delay (e.g., 300 seconds on Sepolia)
 
 # Execute the proposal
-npx hardhat run scripts/execute.ts --network sepolia
-
-# Or use debug script for detailed output
-npx hardhat run scripts/debug-execute.ts --network sepolia
+yarn hardhat run scripts/execute.ts --network sepolia
 ```
-
-### Localhost Workflow (Fast Testing)
-
-For rapid testing with time manipulation:
-
-```bash
-# Start local node
-npx hardhat node
-
-# Deploy (in another terminal)
-npx hardhat ignition deploy ignition/modules/FullDaoModule.ts --network localhost --parameters ignition/parameters/localhost-params.json
-
-# Run complete flow (automatic time advancement)
-npx hardhat run scripts/interact-localhost.ts --network localhost
-```
-
-## 📝 Scripts
-
-### Utility Scripts
-
-| Script                     | Purpose                   | Usage                                                                |
-| -------------------------- | ------------------------- | -------------------------------------------------------------------- |
-| `delegate.ts`              | Delegate voting power     | `npx hardhat run scripts/delegate.ts --network sepolia`              |
-| `check-eligibility.ts`     | Check if can propose      | `npx hardhat run scripts/check-eligibility.ts --network sepolia`     |
-| `create-fresh-proposal.ts` | Create unique proposal    | `npx hardhat run scripts/create-fresh-proposal.ts --network sepolia` |
-| `vote.ts`                  | Cast vote on proposal     | `npx hardhat run scripts/vote.ts --network sepolia`                  |
-| `queue.ts`                 | Queue successful proposal | `npx hardhat run scripts/queue.ts --network sepolia`                 |
-| `execute.ts`               | Execute queued proposal   | `npx hardhat run scripts/execute.ts --network sepolia`               |
-
-### Debug Scripts
-
-| Script                         | Purpose                      | Usage                                                                    |
-| ------------------------------ | ---------------------------- | ------------------------------------------------------------------------ |
-| `check-roles.ts`               | Verify role setup            | `npx hardhat run scripts/check-roles.ts --network sepolia`               |
-| `check-execution-readiness.ts` | Check if ready to execute    | `npx hardhat run scripts/check-execution-readiness.ts --network sepolia` |
-| `debug-execute.ts`             | Execute with detailed errors | `npx hardhat run scripts/debug-execute.ts --network sepolia`             |
-| `get-operation-id.ts`          | Get TimeLock operation ID    | `npx hardhat run scripts/get-operation-id.ts --network sepolia`          |
-
-### Complete Flow Scripts
-
-| Script                  | Purpose                    | Network        |
-| ----------------------- | -------------------------- | -------------- |
-| `interact-localhost.ts` | Full automated flow        | Localhost only |
-| `interact-testnet.ts`   | Create proposal on testnet | Sepolia, etc.  |
 
 ## ⚙️ Configuration
 
@@ -370,7 +303,7 @@ Blocks to wait before voting starts after proposal creation.
 Duration of voting in blocks.
 
 - **Localhost**: 5 blocks (~1 minute)
-- **Testnet**: 300 blocks (~1 hour)
+- **Testnet**: 5 blocks (~1 minute)
 - **Mainnet**: 50400 blocks (~7 days)
 
 #### Quorum Percentage
@@ -384,7 +317,7 @@ Minimum percentage of total supply that must vote for proposal to pass.
 Seconds to wait between queue and execution.
 
 - **Localhost**: 10 seconds
-- **Testnet**: 300 seconds (5 minutes)
+- **Testnet**: 10 seconds
 - **Mainnet**: 172800 seconds (2 days)
 
 ## 🔒 Security
@@ -438,7 +371,7 @@ Estimated gas costs on Ethereum mainnet:
 | Queue Proposal   | ~150,000        | ~$4.50             |
 | Execute Proposal | ~100,000        | ~$3.00             |
 
-_Costs are estimates and vary with gas prices_
+Costs are estimates and vary with gas prices
 
 ## 🛠️ Troubleshooting
 
@@ -448,29 +381,15 @@ _Costs are estimates and vary with gas prices_
 
 ```bash
 # Solution: Compile contracts to generate TypeChain types
-npx hardhat compile
+yarn hardhat compile
 ```
 
 **Issue**: "execution reverted" when creating proposal
 
 ```bash
 # Solution: Delegate votes and wait 1 block
-npx hardhat run scripts/delegate.ts --network sepolia
+yarn hardhat run scripts/delegate.ts --network sepolia
 # Wait 12-24 seconds, then create proposal
-```
-
-**Issue**: "Proposal is not queued" when executing
-
-```bash
-# Solution: Check if enough time has passed
-npx hardhat run scripts/check-execution-readiness.ts --network sepolia
-```
-
-**Issue**: TimeLock operation not registered
-
-```bash
-# Solution: Check if proposal was properly queued
-npx hardhat run scripts/check-queue-events.ts --network sepolia
 ```
 
 ## 📚 Resources
@@ -502,16 +421,10 @@ Contributions are welcome! Please follow these guidelines:
 
 ```bash
 # Install dependencies
-npm install
+yarn install
 
 # Run tests
-npm test
-
-# Run linter
-npm run lint
-
-# Format code
-npm run format
+yarn test
 ```
 
 ## 📄 License
@@ -554,6 +467,4 @@ For questions and support:
 
 ---
 
-**Built with ❤️ for decentralized governance**
-
-_Last Updated: December 2025_
+### Built with ❤️ for decentralized governance by Ndubuisi Ugwuja
