@@ -44,7 +44,7 @@ async function main() {
     console.log("✅ Proposal queued successfully!");
     console.log("");
     console.log("⏰ Wait for the TimeLock delay to pass before executing.");
-    console.log("Then run: npx hardhat run scripts/execute.ts --network sepolia");
+    console.log("Then run: yarn hardhat run scripts/execute.ts --network sepolia");
 }
 
 main()
