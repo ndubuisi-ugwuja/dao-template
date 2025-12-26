@@ -173,6 +173,52 @@ const developmentChains = ["hardhat", "localhost"];
               });
           });
 
+          describe("Proposal Queuing Requirements", function () {
+              let proposalId: bigint;
+              const newValue = 55;
+
+              beforeEach(async function () {
+                  // Delegate votes and create proposal
+                  await governanceToken.connect(voter1).delegate(voter1.address);
+                  await mine(1);
+
+                  const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
+                  const tx = await governor
+                      .connect(voter1)
+                      .propose([await box.getAddress()], [0], [encodedFunctionCall], "Proposal: Store 55 in Box");
+
+                  const receipt = await tx.wait();
+                  const event = receipt?.logs.find((log: any) => {
+                      try {
+                          return governor.interface.parseLog(log)?.name === "ProposalCreated";
+                      } catch {
+                          return false;
+                      }
+                  });
+                  const parsedEvent = governor.interface.parseLog(event!);
+                  proposalId = parsedEvent!.args[0];
+              });
+
+              it("Should return true for proposalNeedsQueuing", async function () {
+                  // Wait for voting to complete
+                  await mine(VOTING_DELAY);
+                  await governanceToken.connect(voter2).delegate(voter2.address);
+                  await governor.connect(voter1).castVote(proposalId, 1);
+                  await governor.connect(voter2).castVote(proposalId, 1);
+                  await mine(VOTING_PERIOD);
+
+                  // Check if proposal needs queuing (should be true because we use TimelockControl)
+                  const needsQueuing = await governor.proposalNeedsQueuing(proposalId);
+                  expect(needsQueuing).to.be.true;
+              });
+
+              it("Should return false for proposalNeedsQueuing on pending proposal", async function () {
+                  // For a pending proposal, it should still return true (needs queuing when succeeded)
+                  const needsQueuing = await governor.proposalNeedsQueuing(proposalId);
+                  expect(needsQueuing).to.be.true;
+              });
+          });
+
           describe("Voting", function () {
               let proposalId: bigint;
               const newValue = 77;
@@ -415,6 +461,73 @@ const developmentChains = ["hardhat", "localhost"];
 
                   await expect(governor.execute([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash))
                       .to.be.reverted;
+              });
+          });
+
+          describe("Proposal Cancellation", function () {
+              let proposalId: bigint;
+              const newValue = 66;
+              let encodedFunctionCall: string;
+              let descriptionHash: string;
+
+              beforeEach(async function () {
+                  // Setup and create proposal
+                  await governanceToken.connect(voter1).delegate(voter1.address);
+                  await mine(1);
+
+                  encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
+                  const description = "Proposal: Store 66 in Box";
+                  descriptionHash = ethers.id(description);
+
+                  const tx = await governor
+                      .connect(voter1)
+                      .propose([await box.getAddress()], [0], [encodedFunctionCall], description);
+
+                  const receipt = await tx.wait();
+                  const event = receipt?.logs.find((log: any) => {
+                      try {
+                          return governor.interface.parseLog(log)?.name === "ProposalCreated";
+                      } catch {
+                          return false;
+                      }
+                  });
+                  const parsedEvent = governor.interface.parseLog(event!);
+                  proposalId = parsedEvent!.args[0];
+              });
+
+              it("Should allow proposer to cancel their own proposal", async function () {
+                  // Proposer can cancel their proposal
+                  const cancelTx = await governor
+                      .connect(voter1)
+                      .cancel([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash);
+
+                  await expect(cancelTx).to.emit(governor, "ProposalCanceled").withArgs(proposalId);
+
+                  // Check state is canceled
+                  const state = await governor.state(proposalId);
+                  expect(state).to.equal(2n); // 2 = Canceled
+              });
+
+              it("Should prevent voting on canceled proposal", async function () {
+                  // Cancel proposal
+                  await governor
+                      .connect(voter1)
+                      .cancel([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash);
+
+                  // Wait for voting delay
+                  await mine(VOTING_DELAY);
+
+                  // Try to vote - should fail
+                  await expect(governor.connect(voter1).castVote(proposalId, 1)).to.be.reverted;
+              });
+
+              it("Should not allow non-proposer to cancel proposal", async function () {
+                  // voter2 tries to cancel voter1's proposal
+                  await expect(
+                      governor
+                          .connect(voter2)
+                          .cancel([await box.getAddress()], [0], [encodedFunctionCall], descriptionHash),
+                  ).to.be.reverted;
               });
           });
 
