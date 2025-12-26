@@ -6,9 +6,7 @@ import "dotenv/config";
  * Run with: yarn hardhat run scripts/queue.ts --network sepolia
  */
 async function main() {
-    const { GOVERNOR_ADDRESS } = process.env;
-    const { BOX_ADDRESS } = process.env;
-    const { PROPOSAL_ID } = process.env;
+    const { GOVERNOR_ADDRESS, BOX_ADDRESS, PROPOSAL_ID } = process.env;
     const NEW_VALUE = process.env.NEW_VALUE || "";
 
     if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !PROPOSAL_ID) {

@@ -10,11 +10,7 @@ import "dotenv/config";
 async function main() {
     const [deployer] = await ethers.getSigners();
 
-    const { GOVERNOR_ADDRESS } = process.env;
-    const { BOX_ADDRESS } = process.env;
-    const { GOVERNANCE_TOKEN_ADDRESS } = process.env;
-    const { TIMELOCK_ADDRESS } = process.env;
-    const { NEW_VALUE } = process.env;
+    const { GOVERNOR_ADDRESS, BOX_ADDRESS, GOVERNANCE_TOKEN_ADDRESS, TIMELOCK_ADDRESS, NEW_VALUE } = process.env;
 
     if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !GOVERNANCE_TOKEN_ADDRESS || !TIMELOCK_ADDRESS || !NEW_VALUE) {
         throw new Error("Missing environment variables");
