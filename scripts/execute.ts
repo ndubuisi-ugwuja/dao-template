@@ -6,10 +6,7 @@ import "dotenv/config";
  * Run with: yarn hardhat run scripts/execute.ts --network sepolia
  */
 async function main() {
-    const { GOVERNOR_ADDRESS } = process.env;
-    const { BOX_ADDRESS } = process.env;
-    const { PROPOSAL_ID } = process.env;
-    const { NEW_VALUE } = process.env;
+    const { GOVERNOR_ADDRESS, BOX_ADDRESS, PROPOSAL_ID, NEW_VALUE } = process.env;
 
     if (!GOVERNOR_ADDRESS || !BOX_ADDRESS || !PROPOSAL_ID || !NEW_VALUE) {
         throw new Error("Missing required environment variables");
@@ -34,14 +31,6 @@ async function main() {
     const newValue = parseInt(NEW_VALUE);
     const encodedFunctionCall = box.interface.encodeFunctionData("store", [newValue]);
     const descriptionHash = ethers.id(`Proposal: Store ${newValue} in the Box`);
-
-    console.log("");
-    console.log("Execution parameters:");
-    console.log("- Target:", await box.getAddress());
-    console.log("- Value:", 0);
-    console.log("- Calldata:", encodedFunctionCall);
-    console.log("- Description hash:", descriptionHash);
-    console.log("");
 
     // Try to estimate gas first
     console.log("Estimating gas...");
