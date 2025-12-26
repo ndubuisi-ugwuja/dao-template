@@ -3,7 +3,7 @@ import "dotenv/config";
 
 /**
  * Create a proposal
- * Run with: yarn hardhat run scripts/create-proposal.ts --network sepolia
+ * Run with: yarn hardhat run scripts/propose.ts --network sepolia
  *
  * PREREQUISITE: Must have delegated votes at least 1 block ago!
  */
