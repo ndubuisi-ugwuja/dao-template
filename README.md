@@ -122,9 +122,6 @@ cd dao-template
 
 # Install dependencies
 yarn install
-
-# Copy environment variables
-cp .env.example .env
 ```
 
 ### Environment Setup
@@ -189,12 +186,6 @@ yarn hardhat test
 
 # Run with coverage
 yarn hardhat coverage
-
-# Run with gas reporting
-REPORT_GAS=true yarn hardhat test
-
-# Run specific test file
-yarn hardhat test test/dao-unit-test.ts
 ```
 
 ### Staging Tests
@@ -223,7 +214,7 @@ yarn hardhat run scripts/delegate.ts --network sepolia
 
 ```bash
 # Create proposal with unique value set in your .env
-yarn hardhat run scripts/create-proposal.ts --network sepolia
+yarn hardhat run scripts/propose.ts --network sepolia
 
 # Save the PROPOSAL_ID from output to .env
 ```
@@ -277,8 +268,8 @@ const config: HardhatUserConfig = {
     },
     networks: {
         sepolia: {
-            url: process.env.SEPOLIA_RPC_URL,
-            accounts: [process.env.PRIVATE_KEY],
+            url: SEPOLIA_RPC_URL,
+            accounts: [PRIVATE_KEY],
             chainId: 11155111,
         },
     },
@@ -421,7 +412,7 @@ Contributions are welcome! Please follow these guidelines:
 yarn install
 
 # Run tests
-yarn test
+yarn hardhat test
 ```
 
 ## 📄 License
