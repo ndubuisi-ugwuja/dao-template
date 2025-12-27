@@ -432,6 +432,7 @@ For questions and support:
 - Open an issue on GitHub
 - Review existing documentation
 - Check troubleshooting guide
+- [Connect on x](https://x.com/joovhie_)
 
 ## 🗺️ Roadmap
 
